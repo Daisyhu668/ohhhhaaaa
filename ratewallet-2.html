@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>利率优惠签报 · 智能生成器</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="bg" id="bg"></div>
+
+<!-- Samurai Intro Overlay -->
+<div id="samuraiStage" class="samurai-stage">
+  <canvas id="samuraiTrail" aria-hidden="true"></canvas>
+  <div class="samurai-bg"></div>
+  <div class="samurai-grain"></div>
+  <section id="samuraiLayer" class="samurai-layer">
+    <h1 class="samurai-title">今天您吃了吗</h1>
+    <p class="samurai-sub">按任意键进入</p>
+  </section>
+  <div id="samuraiCursor" class="samurai-cursor"></div>
+  <button id="samuraiSkip" class="samurai-skip">跳过</button>
+  
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="progress" id="progress"></div>
+    <div class="logo" aria-hidden="true"></div>
+    <div>
+      <div class="titlebar">
+        <h1>利率优惠签报 · 智能生成器</h1>
+        <span id="apprBadge" class="pill ok" title="系统按阈值自动判断">
+          <span>审批口径</span>
+          <span id="apprBadgeText">分行审批权限</span>
+        </span>
+        <span class="coin" aria-hidden="true">🪙</span>
+        <span class="pill ml-8">
+          <label class="flex-align-gap6">
+            <input id="themeToggle" type="checkbox"> 深色（Steam风格）
+          </label>
+        </span>
+        <span class="pill ghost ml-auto" id="progressPct" aria-label="页面阅读进度">0%</span>
+      </div>
+      <nav class="topnav">
+        <a href="#sec-basic">基础信息</a>
+        <a href="#sec-pricing">定价参数</a>
+        <a href="#sec-preview">预览</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="grid2">
+    <div class="card" id="sec-basic">
+      <div class="row"><label>分行（用于标题）</label><input id="branch" type="text" value="厦门分行科技业务部" placeholder="如：厦门分行科技业务部"></div>
+      <div class="row"><label>客户名称</label><input id="cust" type="text" placeholder="如：厦门某某科技有限公司"></div>
+      <div class="row"><label>控股类型</label>
+        <select id="holding">
+          <option>民营控股</option>
+          <option>国有控股</option>
+          <option>外资控股</option>
+          <option>集体/其他</option>
+        </select>
+      </div>
+      <div class="row"><label>是否总行战略客户</label>
+        <div class="chips" id="isStrategicChips">
+          <span class="chip sel" data-v="否">否</span>
+          <span class="chip" data-v="是">是</span>
+        </div>
+      </div>
+      <div class="row"><label>是否上市公司</label>
+        <div class="chips" id="isListedChips">
+          <span class="chip sel" data-v="否">否</span>
+          <span class="chip" data-v="是">是</span>
+        </div>
+      </div>
+      <!-- 移除显式选择“申请类型”，在正文中自动判断新增/存量 -->
+      <div class="row"><label>是否申请自律加点豁免</label>
+        <div class="chips" id="isSelfDiscChips">
+          <span class="chip sel" data-v="否">否</span>
+          <span class="chip" data-v="是">是</span>
+        </div>
+      </div>
+      <div class="row"><label>场景预设</label>
+        <div class="chips" id="presetChips"></div>
+      </div>
+      <div class="row"><label>行业类型</label>
+        <select id="industry"></select>
+      </div>
+      <div class="row"><label>客群 (多选)</label>
+        <div class="chips" id="segChips"></div>
+      </div>
+      <div class="row"><label>授信品种 (多选)</label>
+        <div class="chips" id="prodChips"></div>
+      </div>
+      <div class="row"><label>担保方式</label>
+        <select id="gb"></select>
+      </div>
+      <div class="row"><label>贷款用途</label>
+        <select id="use"></select>
+      </div>
+    </div>
+
+    <div class="card" id="sec-pricing">
+      <div class="row"><label>金额（万元）</label><input id="amt" type="number" placeholder="如：500" value="500"></div>
+      <div class="row"><label>期限</label>
+        <select id="tenor">
+          <option>1年</option><option>6个月</option><option>2年</option><option>3年</option><option>4年</option>
+        </select>
+      </div>
+      <div class="row"><label>执行利率（%）</label>
+        <div>
+          <div class="flex-row rel">
+            <input id="rate" type="number" step="0.01" value="2.60" class="w-180" aria-label="执行利率">
+            <span class="hint" id="rateHint">建议：—</span>
+            <span class="info" id="rateInfo" aria-label="建议值说明" tabindex="0">ℹ️</span>
+            <span class="tooltip" id="rateTip">建议值来自“客群×期限”的权限阈值，供参考；实际以产品/审批口径为准。</span>
+            <button class="btn badge sky" id="applySuggest" type="button">应用建议</button>
+          </div>
+        </div>
+      </div>
+      <div class="row"><label>LPR（一年期，%）</label><input id="lpr" type="number" step="0.01" value="3.00"></div>
+      <div class="row"><label>FTP（%）</label><input id="ftp" type="number" step="0.01" value="1.80"></div>
+      <div class="row"><label>是否存量</label>
+        <div class="chips" id="stockChips">
+            <span class="chip sel" data-v="否">否</span>
+            <span class="chip" data-v="是">是</span>
+        </div>
+      </div>
+      <div class="row" id="stockRow">
+        <label>存量利率(%)</label><input id="stockRate" type="number" step="0.01" placeholder="如：3.20">
+      </div>
+      <div class="row"><label>EVA（可手填）</label><input id="eva" type="text" placeholder="如：13.93"></div>
+      <div class="row"><label>低成本资金</label>
+        <div class="chips" id="lowCostChips">
+          <span class="chip" data-v="绿债">绿债</span>
+          <span class="chip" data-v="科技债">科技债</span>
+        </div>
+      </div>
+      
+      <div class="row"><label>OCR 识别 EVA</label>
+        <div>
+          <input id="ocrImg" type="file" accept="image/*" multiple />
+          <div class="small" id="ocrLog">（可选；不进行OCR，仅在导出Word时附带图片）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="sec-notes">
+    <div class="row"><label>综合收益（可多选）</label>
+      <div class="chips" id="incomeChips"></div>
+    </div>
+    <div class="row align-start"><label>综合收益明细（可编辑）</label>
+      <textarea id="incomeDetail" placeholder="将根据上方选择自动生成，可自行完善指标与金额…"></textarea>
+    </div>
+    <div class="row align-start"><label>补充说明 (可选)</label>
+      <textarea id="note" placeholder="如有其他需要说明的事项，请在此处填写..."></textarea>
+    </div>
+  </div>
+
+  <!-- 新增：风格与合规模块 -->
+  <!-- 合规/免责声明模块按产品要求已移除 -->
+
+  
+
+  <div class="card" id="sec-preview">
+    <div class="row onecol"><label class="full-span">预览</label>
+      <div class="hints" id="smartHints"></div>
+      <div class="titlebar bar-between m6">
+        <div class="fw-700">正文（完整）</div>
+      </div>
+      <div id="out"></div>
+      <div class="brick"></div>
+      <div class="titlebar bar-between mt10-mb6">
+        <div class="fw-700">OA 摘要（基础要点）</div>
+      </div>
+      <div id="summaryOut"></div>
+      <div class="subtle">提示：正文用于附件或完整签报；摘要适配 OA 字段。</div>
+    </div>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="dock-inner">
+    <button class="btn" id="btnCopy">复制正文</button>
+    <button class="btn" id="btnCopySummary">复制摘要</button>
+    <button class="btn sky" id="btnOcr">附带EVA截图</button>
+    <button class="btn ghost" id="btnDocx">生成 Word（含图片）</button>
+    <button class="btn ghost" id="btnCheer">联系作者</button>
+    <span class="log" id="log">就绪</span>
+  </div>
+</div>
+
+<div id="cheerModal" class="modal">
+  <div class="panel pos-rel">
+    <span class="close" id="cheerClose" title="关闭">✖</span>
+    <h3 class="m0 mb-8">我爱XD.Hu</h3>
+    <p class="small">你就说棒不棒～！内容记得核对哦，我希望你我都可以更快、更准、更合规地完成日常工作。</p>
+    <p class="small">狠狠给我夸！欢迎联系：<b>coolkiy@gmail.com</b></p>
+    <p class="small">感谢支持，感谢夸奖，别给建议～改不过来～我会优化～持续优化～ 么么哒～</p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
