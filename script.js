@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = sel === '#out' ? $('#btnCopy') : $('#btnCopySummary');
         if (btn){
           const mark = document.createElement('span');
-          mark.className = 'checkmark'; mark.innerHTML = '✅ 已复制';
+          mark.className = 'checkmark'; mark.innerHTML = '✅ 美美哒去粘贴吧';
           btn.insertAdjacentElement('afterend', mark);
           requestAnimationFrame(()=> mark.classList.add('show'));
           setTimeout(()=> { mark.classList.remove('show'); setTimeout(()=> mark.remove(), 180); }, 2000);
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const attach = '附件：1.EVA测算截图 2.审批通知书' + (isSelfDisc==='是' ? ' 3.人行报备报告及表格' : '');
       return [
         '四、其他事项',
-        '1. 关联方已穿透核查，结论：非我行关联方。',
+        '1. 关联方已核验，非我行关联方。',
         (isSelfDisc==='是') ? '2. 拟申请豁免自律加点：附人行报备报告及表格，并同步计财部审批。' : '2. 不申请豁免自律加点。',
         attach,
         note?`\n补充说明：\n${note}`:''
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const doc = new Document({ sections: [{ children: docChildren }] });
             const blob = await Packer.toBlob(doc);
             downloadBlob(`利率优惠签报_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.docx`, blob);
-            toast('✔ Word文档已生成');
+            toast('✔ Word文档已搞定');
         } catch (e) {
             console.error(e);
             toast(e.message || '生成Word失败，请检查控制台');
